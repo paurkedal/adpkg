@@ -1,0 +1,8 @@
+description = "Transitory Additions to topkg"
+version = "%%VERSION_NUM%%"
+requires = "topkg"
+archive(byte) = "adpkg.cma"
+archive(native) = "adpkg.cmxa"
+plugin(byte) = "adpkg.cma"
+plugin(native) = "adpkg.cmxs"
+exists_if = "adpkg.cma"
