@@ -149,14 +149,14 @@ module Modules = struct
     | Some f -> Ad_fpath.cat (f tags (Fpath.dirname m)) (Fpath.basename m)
     end |> Option.fold Ad_fpath.strip_dir strip_dir
 
-  let extract ?(filter = fun _ -> true) ?map_dir ?strip_dir modules =
+  let extract ?(filter = Filter.any) ?map_dir ?strip_dir modules =
     let aux m tags acc =
       if filter tags
       then modify_dir ?map_dir ?strip_dir tags m :: acc
       else acc in
     List.rev (String_map.fold aux modules [])
 
-  let write ?(filter = fun _ -> true) ?map_dir ?strip_dir modules oc =
+  let write ?(filter = Filter.any) ?map_dir ?strip_dir modules oc =
     let aux m tags =
       if filter tags then begin
         output_string oc (modify_dir ?map_dir ?strip_dir tags m);
@@ -169,7 +169,7 @@ module Modules = struct
     OS.Dir.must_exist (Fpath.dirname fp) >>= fun _ ->
     Ad_os_file.with_open_out (write ?filter ?map_dir ?strip_dir modules) fp
 
-  let mllib ?(filter = fun _ -> true) ?strip_dir modules
+  let mllib ?(filter = Filter.any) ?strip_dir modules
             ?field ?cond ?dst_dir fp =
     let strip_dir =
       match strip_dir with
