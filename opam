@@ -8,7 +8,7 @@ dev-repo: "https://github.com/paurkedal/adpkg.git"
 doc: "http://paurkedal.github.io/adpkg/"
 license: "LGPL-3 with OCaml linking exception"
 
-build: [ocaml "pkg/pkg.ml" "build" "--installer" "true"]
+build: [ocaml "pkg/pkg.ml" "build" "--pinned" "%{pinned}%"]
 depends: [
   "ocamlbuild" {build}
   "topkg" {build}
