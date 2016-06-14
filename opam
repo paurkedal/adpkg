@@ -5,6 +5,7 @@ maintainer: "paurkedal@gmail.com"
 homepage: "https://github.com/paurkedal/adpkg/"
 bug-reports: "https://github.com/paurkedal/adpkg/issues"
 dev-repo: "https://github.com/paurkedal/adpkg.git"
+doc: "http://paurkedal.github.io/adpkg/"
 license: "LGPL-3 with OCaml linking exception"
 
 build: [ocaml "pkg/pkg.ml" "build" "--installer" "true"]
