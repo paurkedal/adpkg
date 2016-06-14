@@ -67,7 +67,11 @@ module Modules : sig
 
   val union : t -> t -> t
 
-  val extract : ?filter: Filter.t -> ?strip_dir: fpath -> t -> string list
+  val extract :
+    ?filter: Filter.t ->
+    ?map_dir: (Tags.t -> fpath -> fpath) ->
+    ?strip_dir: fpath ->
+    t -> string list
 
   val write :
     ?filter: Filter.t ->

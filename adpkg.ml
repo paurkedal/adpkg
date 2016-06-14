@@ -143,22 +143,23 @@ module Modules = struct
       | Some tags1, Some tags2 -> Some (Tags.union tags1 tags2) in
     String_map.merge aux ms1 ms2
 
-  let extract ?(filter = fun _ -> true) ?strip_dir modules =
+  let modify_dir ?map_dir ?strip_dir tags m =
+    begin match map_dir with
+    | None -> m
+    | Some f -> Ad_fpath.cat (f tags (Fpath.dirname m)) (Fpath.basename m)
+    end |> Option.fold Ad_fpath.strip_dir strip_dir
+
+  let extract ?(filter = fun _ -> true) ?map_dir ?strip_dir modules =
     let aux m tags acc =
       if filter tags
-      then Option.fold Ad_fpath.strip_dir strip_dir m :: acc
+      then modify_dir ?map_dir ?strip_dir tags m :: acc
       else acc in
     List.rev (String_map.fold aux modules [])
 
   let write ?(filter = fun _ -> true) ?map_dir ?strip_dir modules oc =
     let aux m tags =
-      let m =
-        match map_dir with
-        | None -> m
-        | Some f ->
-          Ad_fpath.cat (f tags (Fpath.dirname m)) (Fpath.basename m) in
       if filter tags then begin
-        output_string oc (Option.fold Ad_fpath.strip_dir strip_dir m);
+        output_string oc (modify_dir ?map_dir ?strip_dir tags m);
         output_char oc '\n'
       end in
     try Ok (String_map.iter aux modules)
