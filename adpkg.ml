@@ -85,6 +85,7 @@ type tags = Tags.t
 module Filter = struct
   type t = tags -> bool
 
+  let any tags = true
   let not f tags = not (f tags)
   let (&&) f1 f2 tags = f1 tags && f2 tags
   let (||) f1 f2 tags = f1 tags || f2 tags
@@ -131,6 +132,8 @@ module Modules = struct
           (m, tags') in
       (succ fl, add ~tags:tags' ?dir m acc) in
     Ad_os_file.fold_lines add_line fp (1, modules) >>| snd
+
+  let of_file ?tags ?dir fp = add_file ?tags ?dir fp empty
 
   let union ms1 ms2 =
     let aux m tags1 tags2 =

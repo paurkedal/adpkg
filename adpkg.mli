@@ -46,6 +46,7 @@ end
 module Filter : sig
   type t
 
+  val any : t
   val not : t -> t
   val (&&) : t -> t -> t
   val (||) : t -> t -> t
@@ -61,6 +62,8 @@ module Modules : sig
   val add : ?tags: Tags.t -> ?dir: fpath -> string -> t -> t
 
   val add_file : ?tags: tags -> ?dir: fpath -> fpath -> t -> t result
+
+  val of_file : ?tags: tags -> ?dir: fpath -> fpath -> t result
 
   val union : t -> t -> t
 
