@@ -66,10 +66,17 @@ module Modules : sig
 
   val extract : ?filter: Filter.t -> ?strip_dir: fpath -> t -> string list
 
-  val write : ?filter: Filter.t -> ?strip_dir: fpath -> out_channel ->
-              t -> unit result
+  val write :
+    ?filter: Filter.t ->
+    ?map_dir: (Tags.t -> fpath -> fpath) ->
+    ?strip_dir: fpath ->
+    t -> out_channel -> unit result
 
-  val save : ?filter: Filter.t -> ?strip_dir: fpath -> fpath -> t -> unit result
+  val save :
+    ?filter: Filter.t ->
+    ?map_dir: (Tags.t -> fpath -> fpath) ->
+    ?strip_dir: fpath ->
+    t -> fpath -> unit result
 
   val mllib :
     ?filter: Filter.t -> ?strip_dir: fpath -> t ->

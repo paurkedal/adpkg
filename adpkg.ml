@@ -40,11 +40,17 @@ exception Parse_error of string * int * string
 let parse_error fp fl msg = raise (Parse_error (fp, fl, msg))
 
 module Ad_fpath = struct
+
   let strip_dir dir fp =
     let n = String.length dir in
     if n < String.length fp && String.is_prefix dir fp && fp.[n] = '/'
     then String.with_index_range ~first:(n + 1) fp
     else fp
+
+  let cat = function
+    | "" | "." -> fun fp -> fp
+    | dir -> Fpath.append dir
+
 end
 
 module Ad_os_file = struct
@@ -141,20 +147,23 @@ module Modules = struct
       else acc in
     List.rev (String_map.fold aux modules [])
 
-  let write ?(filter = fun _ -> true) ?strip_dir oc modules =
+  let write ?(filter = fun _ -> true) ?map_dir ?strip_dir modules oc =
     let aux m tags =
+      let m =
+        match map_dir with
+        | None -> m
+        | Some f ->
+          Ad_fpath.cat (f tags (Fpath.dirname m)) (Fpath.basename m) in
       if filter tags then begin
         output_string oc (Option.fold Ad_fpath.strip_dir strip_dir m);
         output_char oc '\n'
       end in
-    try
-      Ok (String_map.iter aux modules)
-    with
-    | Sys_error msg -> Error (`Msg msg)
+    try Ok (String_map.iter aux modules)
+    with Sys_error msg -> Error (`Msg msg)
 
-  let save ?filter ?strip_dir fp modules =
+  let save ?filter ?map_dir ?strip_dir modules fp =
     OS.Dir.must_exist (Fpath.dirname fp) >>= fun _ ->
-    Ad_os_file.with_open_out (fun oc -> write ?filter ?strip_dir oc modules) fp
+    Ad_os_file.with_open_out (write ?filter ?map_dir ?strip_dir modules) fp
 
   let mllib ?(filter = fun _ -> true) ?strip_dir modules
             ?field ?cond ?dst_dir fp =
@@ -162,7 +171,7 @@ module Modules = struct
       match strip_dir with
       | Some dir -> dir
       | None -> Fpath.dirname fp in
-    save ~filter ~strip_dir fp modules >>| fun () ->
+    save ~filter ~strip_dir modules fp >>| fun () ->
     let api_filter = Filter.(filter && not (tagged "internal")) in
     let api = extract ~filter:api_filter ~strip_dir modules in
     Pkg.mllib ~api ?dst_dir fp
